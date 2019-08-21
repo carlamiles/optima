@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Login & Registration</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        body {
+
+            background-color: none;
+            color: antiquewhite;
+        }
+
+        .registration {
+            background-color: #FF0000;
+            padding: 42px;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+
+        .registration a:link,
+        a:visited {
+            text-decoration: none;
+            color: antiquewhite;
+        }
+
+        .optima_img {
+            height: 120px;
+            margin-left: 39px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row mt-3">
+
+
+            <div class="registration col-sm-6">
+                <h2>Login</h2>
+
+
+                <br>
+                {% if messages %}
+                {% for message in messages %}
+                {% if "login" in message.extra_tags %}
+                <div class="alert alert-danger">{{ message }}</div>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+                <form action="/process_login" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="email_log">Email</label>
+                        <input type="text" class="form-control" name="email_log" id="email_log"
+                            placeholder="name@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="password_log">Password</label>
+                        <input type="password" class="form-control" name="password_log" id="password_log"
+                            placeholder="Password">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Log In</button>
+                </form>
+                <br>
+                <a href="/">Need an account? Register here! <img class="optima_img"
+                        src="{% static 'optima_app/images/Optima_Flag.png' %}" /></a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

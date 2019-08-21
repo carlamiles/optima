@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Optima</title>
+    {% load static %}
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        html,
+        body,
+        #mp {
+            height: 100%;
+            width: 100%;
+            margin: 0px;
+            padding: 0px;
+            background-color: #FF0000;
+            color:antiquewhite;
+        }
+
+        #map {
+            height: 600px;
+            width: 600px;
+        }
+
+        .optima_img {
+            width: 800px;
+        }
+        .JumboHeaderImage{
+            /* background-image: url("apps\optima_app\static\optima_app\images\Optima_Flag.png"); */
+            background-size: cover;
+            background-color: #FF0000;
+            height: 30%;
+        }
+        #directions-panel{
+            /* background-color: antiquewhite; */
+            border-radius: 3px;
+            color:antiquewhite;
+        }
+        a:link,
+        a:visited {
+            text-decoration: none;
+            color: antiquewhite;
+        }
+
+
+
+
+    </style>
+</head>
+
+<body>
+
+    <div class="jumbotron JumboHeaderImage jumbotron-fluid">
+        <div class="container">
+            <img class="optima_img" src="{% static 'optima_app/images/Optima_Flag.png' %}" />
+
+        </div>
+    </div>
+
+
+
+
+
+    <div id="mp" class="container-fluid p-3">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-5 m-5">
+
+                <div class="form-group row">
+                    <div class="col-sm-5">
+                        {% if logged_in == 0 %}
+                        <a href="/login">Register</a> | <a href="/login">Log In</a>
+                        {% else %}
+                        <a href="my_account/{{ user.id }}">My Account</a> | <a href="/logout">Logout</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <h2>Welcome to Optima, {{user.first_name}}!</h2>
+                </div>
+
+                <div class="form-group row">
+                    <h3>Let us create the optimal route for you!</h3>
+                </div>
+
+                <!-- <form action="" method="post"> -->
+                {% csrf_token %}
+                <div class="form-group">
+                    <h5>Starting Location</h5>
+                    <label for="start"></label>
+                    <input type="text" class="form-control column col-sm-5" id="start"
+                        placeholder="123 Main Street, Chicago, IL 60611" value="">
+                    <br>
+                    <h5>Add up to 4 locations between your start and end points</h5>
+                </div>
+
+                <div id="new_location">
+                </div>
+                <div class="form-group column col-sm-5">
+                    <button id="add_location" class="btn btn-primary">Add Location</button><br> <br>
+                </div>
+                <div class="form-group">
+                    <h5>Ending Location</h5>
+                    <label for="start"></label>
+                    <input type="text" class="form-control column col-sm-5" id="end"
+                        placeholder="123 Main Street, Chicago, IL 60611" value="">
+                </div>
+                <button type="submit" href="" class="btn btn-primary" id="submit">SUBMIT</button>
+                <!-- </form> -->
+            </div>
+
+            <div class="col-sm-12 col-md-12 col-lg-5">
+                <div class="container">
+                    <div id="map"></div>
+                </div>
+                <br>
+                <div id="directions-panel"></div>
+            </div>
+        </div>
+    </div>
+
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key={{google_maps_api_key}}&callback=initMap">
+        </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+    <script>
+        function initMap() {
+            var directionsService = new google.maps.DirectionsService;
+            var directionsDisplay = new google.maps.DirectionsRenderer;
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 6,
+                center: {
+                    lat: 41.85,
+                    lng: -87.65
+                }
+            });
+            directionsDisplay.setMap(map);
+
+            document.getElementById('submit').addEventListener('click', function () {
+                calculateAndDisplayRoute(directionsService, directionsDisplay);
+            });
+        }
+
+        function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+            var waypts = [];
+            var checkboxArray = document.getElementsByClassName('waypoints');
+            for (var i = 0; i < checkboxArray.length; i++) {
+                var address = checkboxArray[i].value;
+                if (address !== '') {
+                    waypts.push({
+                        location: address,
+                        stopover: true
+                    });
+                }
+            }
+
+            directionsService.route({
+                origin: document.getElementById('start').value,
+                destination: document.getElementById('end').value,
+                waypoints: waypts,
+                optimizeWaypoints: true,
+                travelMode: 'DRIVING'
+            }, function (response, status) {
+                if (status === 'OK') {
+                    directionsDisplay.setDirections(response);
+                    console.log(response);
+                    var route = response.routes[0];
+                    console.log(route.legs[0].distance.value);
+                    var summaryPanel = document.getElementById('directions-panel');
+                    summaryPanel.innerHTML = '';
+                    // For each route, display summary information
+                    // Added a var to hold the total sum of a route
+                    var sum_dist = 0;
+                    var sum_dur = 0;
+                    for (var i = 0; i < route.legs.length; i++) {
+                        var routeSegment = i + 1;
+                        summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment +
+                            '</b><br>';
+                        summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
+                        summaryPanel.innerHTML += route.legs[i].end_address + '<br><br>' + ' Directions: ' + '<br>';
+                        // directions
+                        for (var j = 0; j < route.legs[i].steps.length; j++) {
+                            summaryPanel.innerHTML += route.legs[i].steps[j].instructions + '<br>';
+                        }
+                        
+                        summaryPanel.innerHTML += '<br>Distance: ';
+                        summaryPanel.innerHTML += route.legs[i].distance.text + '<br>' + ' Duration: ';
+                        summaryPanel.innerHTML += route.legs[i].duration.text + '<br><br>';
+                        
+                        // sum calculation                
+                        sum_dist += route.legs[i].distance.value;
+                        sum_dur += route.legs[i].duration.value;                        
+                        
+                    }
+                    console.log('route sum', sum_dist);
+                    summaryPanel.innerHTML += 'Total Distance: ';
+                    summaryPanel.innerHTML += (Math.round(sum_dist / 1609.344)) + ' mi' + '<br>';
+                    console.log('duration sum', sum_dur);
+                    summaryPanel.innerHTML += 'Total Duration: ';
+                    
+                    // separates hours from minutes
+                    var totalMin = (sum_dur / 60);
+                    var hours = Math.floor(totalMin / 60);
+                    var minLeft = totalMin - 60;
+                    summaryPanel.innerHTML += hours + ' hour(s) ';
+                    summaryPanel.innerHTML += Math.round((60 - (((Math.ceil(totalMin / 60))  - (totalMin / 60)) * 60))) + ' mins' + '<br><br><br><br><br>';
+
+                    var locations = [document.getElementById('start').value, document.getElementById('end').value]
+                    console.log(locations);
+                    for (var i = 0; i < waypts.length; i++) {
+                        locations.push(waypts.value);
+                    }
+                    console.log(locations);
+
+                } else {
+                    window.alert('Directions request failed due to ' + status);
+                }
+            });
+        }
+
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            var max_fields = 5; //maximum input boxes allowed
+            var wrapper = $("#items"); //Fields wrapper
+            var add_button = $("#add_location"); //Add button ID
+
+            var x = 1; //initlal text box count
+            $(add_button).click(function (e) { //on add input button click
+                console.log(x)
+                e.preventDefault();
+                if (x < max_fields) { //max input box allowed
+                    x++;
+                    $("#new_location").append(
+                        "<div class='form-group' mt-2><input type='text' class='form-control waypoints' placeholder='123 Main Street, Chicago, IL 60611'></div>"
+                    );
+                }
+            });
+
+            $(wrapper).on("click", ".remove_field", function (e) { //user click on remove field
+                e.preventDefault(); $(this).parent('div').remove(); x--;
+            })
+        });
+
+    </script>
+</body>
+
+
+</html>

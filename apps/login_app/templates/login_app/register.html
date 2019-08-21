@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Login & Registration</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <style>
+        body {
+
+            background-color: none;
+            color: antiquewhite;
+        }
+
+        .registration {
+            background-color: #FF0000;
+            padding: 42px;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+
+        .registration a:link,
+        a:visited {
+            text-decoration: none;
+            color: antiquewhite;
+        }
+
+        .optima_img {
+            height: 119px;
+            margin-left: 122px;
+            margin-top: 39px;
+            margin-bottom: -38px;
+        }
+    </style>
+</head>
+
+<body class="">
+    <div class="container">
+        <div class="row mt-3">
+            <div class="registration col-sm-6">
+                <h2>Registration</h2>
+                <br>
+                {% if messages %}
+                {% for message in messages %}
+                {% if "register" in message.extra_tags %}
+                <div class="alert alert-danger">{{ message }}</div>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+                <form class="" action="/register_user" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="first_name">First Name</label>
+                        <input type="text" class="form-control" name="first_name" id="first_name">
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">Last Name</label>
+                        <input type="text" class="form-control" name="last_name" id="last_name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email_reg">Email</label>
+                        <input type="text" class="form-control" name="email" id="email" placeholder="name@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="password_reg">Password</label>
+                        <input type="password" class="form-control" name="password_reg" id="password_reg"
+                            placeholder="Password">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_password_reg">Confirm PW</label>
+                        <input type="password" class="form-control" name="confirm_password_reg"
+                            id="confirm_password_reg" placeholder="Password">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </form><br>
+                <a href="/login">Already registered? Login here!</a>
+                <img class="optima_img"
+                        src="{% static 'optima_app/images/Optima_Flag.png' %}" /></a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

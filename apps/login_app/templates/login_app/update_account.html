@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+​
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Login & Registration</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        body {
+
+            background-color: none;
+            color: antiquewhite;
+        }
+
+        .registration {
+            background-color: #FF0000;
+            padding: 42px;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+
+        .registration a:link,
+        a:visited {
+            text-decoration: none;
+            color: antiquewhite;
+        }
+        .optima_img {
+            height: 119px;
+            margin-left: 122px;
+            margin-top: 39px;
+            margin-bottom: -38px;
+        }
+    </style>
+</head>
+​
+
+<body>
+    <div class="container registration">
+        <div class="d-flex justify-content-between">
+            <a href="/routes">Back</a>
+            <a href="/logout">Logout</a>
+        </div>
+        <div class="text-center">
+            <h2>{{user.first_name}}'s Account</h2>
+        </div>
+        <div class="registration mx-auto w-50">
+            ​
+            <br>
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            <form action="/update_account/{{ user.id }}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="first_name">First Name</label>
+                    <input type="text" class="form-control" name="first_name" id="first_name"
+                        value="{{user.first_name}}">
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" class="form-control" name="last_name" id="last_name" value="{{user.last_name}}">
+                </div>
+                <div class="form-group">
+                    <label for="email_reg">Email</label>
+                    <input type="text" class="form-control" name="email" id="email" value="{{user.email_address}}">
+                </div>
+                <div class="form-group">
+                    <label for="password_reg">Password</label>
+                    <input type="password" class="form-control" name="password_reg" id="password_reg"
+                        value="{{user.password_reg}}">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Update Account</button>
+                    <img class="optima_img" src="{% static 'optima_app/images/Optima_Flag.png' %}" />
+            </form>
+        </div>
+        ​
+    </div>
+</body>
+​
+
+</html>
